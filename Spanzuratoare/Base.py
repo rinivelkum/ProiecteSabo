@@ -2,7 +2,6 @@ import codecs
 import random
 
 words = codecs.open('cuvinte_de_verificat.csv','r','utf8')
-random_number = random.randint(1,100) # daca se doreste identificarea unui cuvant anume, se inlocuieste aici cu int(input())
 
 def alphabet():
     alphabet = list(map(chr, range(65, 91)))
@@ -16,13 +15,6 @@ def alphabet():
     alphabet.remove("Y") # am scos literele respective, daca ar fi sa am de fiecare data cuvinte random, as sterge liniile astea 3 cu ".remove"
     return "".join(alphabet)
 
-def select_word():
-    i = 1
-    for word in words:
-        if i == random_number:
-            return word.replace(str(random_number), "")[1:]
-        i += 1
-
 def word_digest(word, alpha):
     word = word.replace("*", "")
     for char in word:
@@ -34,30 +26,33 @@ def word_digest(word, alpha):
 
 def auto_hangman(word):
     tries = 1
-    alpha = characters
-    while(tries < 10 and len(word) > 1):
-        char = random.choice(alpha) #aici se inlocuieste cu str(input()) pentru a face jocul sa fie manual
-        print(char) # pentru debugging, sa vad ce introduce pc-ul
+    temp = alpha
+    while(tries < 10 and len(word) > 2):
+        char = random.choice(temp) #aici se inlocuieste cu str(input()) pentru a face jocul sa fie manual
         if char in word:
             word = word.replace(char, "")
-            alpha = alpha.replace(char,"")
+            temp = temp.replace(char,"")
         else:
             tries += 1
-            alpha = alpha.replace(char, "")
+            temp = temp.replace(char, "")
 
     if tries == 10:
         return False
     return True
 
 characters = alphabet()
-random_word = select_word()
-random_word, characters = word_digest(random_word, characters)
 Tries = 0
-while(auto_hangman(random_word) == False):
-    Tries += 1
-    print("-------------------------------------") #debugging
+word_no = 1
+
+for word in words:
+    alpha = characters
+    word = word.replace(str(word_no), "")[1:]
+    word_no += 1
+    word, alpha = word_digest(word, alpha)
+    while(auto_hangman(word) == False):
+        Tries += 1
+
 print("Number of tries:",Tries)
-print("Word to find out:",random_word)
 
 # codul functioneaza dupa fisiere de tip *.csv cu format astfel: NR;CUVANT PARTIAL;CUVANT INTREG
 # spre ex: 38;E*******LE;EXONDĂRILE
